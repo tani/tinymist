@@ -14,7 +14,18 @@ import {
 } from "./preview";
 import { tinymist } from "./lsp";
 import { loadHTMLFile } from "./util";
+import {
+  isGitpod,
+  translateGitpodURL
+} from "./gitpod";
 
+function translateExternalURL(urlstr: string): string {
+  if (isGitpod()) {
+    return translateGitpodURL(urlstr)
+  } else {
+    return urlstr;
+  }
+}
 const vscodeVariables = require("vscode-variables");
 
 let isTinymist = false;
@@ -299,7 +310,7 @@ export const launchPreviewCompat = async (task: LaunchInBrowserTask | LaunchInWe
     }
   });
 
-  let connectUrl = `ws://127.0.0.1:${dataPlanePort}`;
+  let connectUrl = translateExternalURL(`ws://127.0.0.1:${dataPlanePort}`);
   contentPreviewProvider.then((p) => p.postActivate(connectUrl));
   let panel: vscode.WebviewPanel | undefined = undefined;
   if (task.kind == "webview") {
@@ -461,7 +472,7 @@ export class Addon2Server {
     bindDocument: vscode.TextDocument,
     activeEditor: vscode.TextEditor,
   ) {
-    const conn = new WebSocket(`ws://127.0.0.1:${controlPlanePort}`);
+    const conn = new WebSocket(translateExternalURL(`ws://127.0.0.1:${controlPlanePort}`));
     conn.addEventListener("message", async (message) => {
       const data = JSON.parse(message.data as string);
       switch (data.event) {

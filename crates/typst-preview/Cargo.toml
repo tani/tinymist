@@ -26,6 +26,8 @@ serde_json.workspace = true
 futures.workspace = true
 indexmap.workspace = true
 serde.workspace = true
+anyhow.workspace = true
+url.workspace = true
 
 clap = { workspace = true, optional = true }
 
