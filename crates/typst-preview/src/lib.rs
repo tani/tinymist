@@ -2,7 +2,6 @@ mod actor;
 mod args;
 mod debug_loc;
 mod outline;
-mod gitpod;
 pub use actor::editor::{
     CompileStatus, ControlPlaneMessage, ControlPlaneResponse, LspControlPlaneRx, LspControlPlaneTx,
 };
@@ -246,15 +245,12 @@ async fn preview_<T: CompileHost + Send + Sync + 'static>(
             info!("Control plane client shutdown");
         })
     };
-    
+
     let data_plane_port = data_plane_port_rx.await.unwrap();
-    let url = format!("ws://127.0.0.1:{data_plane_port}");
-    let new_url = if gitpod::is_gitpod() {
-        gitpod::translate_gitpod_url(&url).unwrap()
-    } else {
-        url
-    };
-    let html = html.replace("ws://127.0.0.1:23625", &new_url);
+    let data_plane_port_str = data_plane_port.to_string();
+    let data_plane_url_template = arguments.data_plane_url_template;
+    let url = data_plane_url_template.replace("{{port}}", &data_plane_port_str);
+    let html = html.replace("ws://127.0.0.1:23625", &url);
     // previewMode
     let frontend_html_factory = Box::new(move |mode| -> String {
         let mode = match mode {

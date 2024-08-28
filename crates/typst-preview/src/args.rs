@@ -40,6 +40,18 @@ pub struct PreviewArgs {
     )]
     pub data_plane_host: String,
 
+    /// Template of websocket URL for data plane server. 
+    #[cfg_attr(
+        feature = "clap",
+        clap(
+            long = "data-plane-url-template",
+            default_value = "ws://127.0.0.1:{{port}}",
+            value_name = "TEMPLATE",
+            hide(true)
+        )
+    )]
+    pub data_plane_url_template: String,
+
     /// Control plane server will bind to this address
     #[cfg_attr(
         feature = "clap",

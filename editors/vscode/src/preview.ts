@@ -20,15 +20,24 @@ import {
   registerPreviewTaskDispose,
 } from "./extension";
 import {
+  createGitpodUrlTemplate,
   isGitpod,
   translateGitpodURL
 } from "./gitpod";
 
 function translateExternalURL(urlstr: string): string {
   if (isGitpod()) {
-    return translateGitpodURL(urlstr)
+    return translateGitpodURL(urlstr);
   } else {
     return urlstr;
+  }
+}
+
+function createUrlTemplate(): string {
+  if (isGitpod()) {
+    return createGitpodUrlTemplate();
+  } else {
+    return 'ws://127.0.0.1:{{port}}';
   }
 }
 
@@ -307,6 +316,7 @@ async function launchPreviewLsp(task: LaunchInBrowserTask | LaunchInWebViewTask)
     const invertColorsArgs = ivArgs ? ["--invert-colors", JSON.stringify(ivArgs)] : [];
     const previewInSlideModeArgs = task.mode === "slide" ? ["--preview-mode=slide"] : [];
     const dataPlaneHostArgs = !isDev ? ["--data-plane-host", "127.0.0.1:0"] : [];
+    const dataPlaneUrlTemplateArgs = !isDev ? ["--data-plane-url-template", createUrlTemplate()] : [];
     const { dataPlanePort, staticServerPort, isPrimary } = await commandStartPreview([
       "--task-id",
       taskId,
@@ -314,6 +324,7 @@ async function launchPreviewLsp(task: LaunchInBrowserTask | LaunchInWebViewTask)
       refreshStyle,
       "--static-file-host",
       "127.0.0.1:0",
+      ...dataPlaneUrlTemplateArgs,
       ...dataPlaneHostArgs,
       ...partialRenderingArgs,
       ...invertColorsArgs,

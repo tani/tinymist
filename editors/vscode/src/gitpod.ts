@@ -29,3 +29,13 @@ export function translateGitpodURL(urlstr: string): string {
   url.port = ''
   return url.toString()
 }
+
+/**
+ * Create a Gitpod URL template for data plane server.
+ * @return The Gitpod URL template
+ */
+export function createGitpodUrlTemplate(): string {
+  return 'wss://{{port}}'
+    + '-' + process.env.GITPOD_WORKSPACE_ID
+    + '.' + process.env.GITPOD_WORKSPACE_CLUSTER_HOST
+}
